@@ -56,12 +56,12 @@ def calculate_m_plus(h: np.ndarray, m_minus: np.ndarray) -> np.ndarray:
     return result
 
 
-def calculate_s(old_s: np.ndarray, m_plus: np.ndarray) -> np.ndarray:
-    result: np.ndarray = np.empty(len(old_s))
+def calculate_s(start_s: np.ndarray, m_plus: np.ndarray) -> np.ndarray:
+    result: np.ndarray = np.empty(len(start_s))
 
     sums: np.ndarray = m_plus.sum(axis=0)
-    for i in range(len(old_s)):
-        result[i] = old_s[i] + sums[i]
+    for i in range(len(start_s)):
+        result[i] = start_s[i] + sums[i]
 
     return result
 
@@ -97,15 +97,6 @@ def y2s(y: np.ndarray) -> np.ndarray:
     return np.vectorize(y2s_single)(y)
 
 
-def normalize_s(s: np.ndarray) -> np.ndarray:
-    result = np.empty(len(s))
-
-    for i in range(len(result)):
-        result[i] = sign(s[i])
-
-    return result
-
-
 def main() -> None:
     max_steps: int = 4
     y = read_y()
@@ -115,8 +106,8 @@ def main() -> None:
         print('Исходный вектор является кодовый словом')
 
     s = y2s(y)
+    s0 = s.copy()
     m_plus = np.zeros(shape=h.shape)
-    np.empty(shape=m_plus.shape)
 
     print('----INIT----')
     print(f'M+\n{m_plus}')
@@ -127,7 +118,7 @@ def main() -> None:
 
         m_minus = calculate_m_minus(h=h, s=s, m_plus=m_plus)
         m_plus = calculate_m_plus(h=h, m_minus=m_minus)
-        s = calculate_s(old_s=normalize_s(s), m_plus=m_plus)
+        s = calculate_s(start_s=s0, m_plus=m_plus)
         y = s2y(s)
 
         print(f'M-\n{m_minus}')
